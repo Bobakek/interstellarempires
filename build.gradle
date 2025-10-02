@@ -2,20 +2,35 @@ subprojects {
   apply plugin: 'java'
   apply plugin: 'eclipse'
 
+  // Ensure all subprojects compile to Java 8 bytecode for compatibility
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
+
   repositories {
     mavenCentral()
     mavenLocal()
     
-    maven { url "http://streamreasoning.org/maven/" }
+    // Prefer HTTPS; if the remote server doesn't support it, allow insecure protocol explicitly
+    maven {
+      url = uri('https://streamreasoning.org/maven/')
+      // If the server only supports HTTP, uncomment the following line to allow it:
+      // allowInsecureProtocol = true
+    }
   }
 
   dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.8.2'
-    compile group: 'junit', name: 'junit', version: '4.8.2'
+    testImplementation group: 'junit', name: 'junit', version: '4.8.2'
+    implementation group: 'junit', name: 'junit', version: '4.8.2'
 
-    compile group:'org.projectlombok', name: 'lombok', version:'1.14.8'
+    // Use lombok as compileOnly and as an annotation processor
+    compileOnly 'org.projectlombok:lombok:1.18.26'
+    annotationProcessor 'org.projectlombok:lombok:1.18.26'
   }
 
   version = '1.0'
-  jar { manifest.attributes provider: 'Lonely Robot' }
+  jar {
+    manifest {
+      attributes('provider': 'Lonely Robot')
+    }
+  }
 }

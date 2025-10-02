@@ -8,5 +8,5 @@ sourceSets.test.java.srcDirs = [ "test/" ]
 dependencies {
 
   /* Include shared net framework */
-  compile project(':NetFramework')
+  implementation project(':NetFramework')
 }

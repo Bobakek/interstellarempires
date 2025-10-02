@@ -1,1 +1,31 @@
+plugins {
+	id 'application'
+}
+
+// keep Java 1.8 compatibility
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+// mirror layout used by other modules in this repo
+sourceSets.main.java.srcDirs = ['src/']
+
+application {
+	mainClass = 'io.lonelyrobot.empires.server.ServerMain'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// small, self-contained server; add dependencies here if needed
+}
+
+// small helper task to run a test client that connects to the server
+task runClient(type: JavaExec) {
+	group = 'application'
+	description = 'Run a simple test client that connects to localhost:51234'
+	classpath = sourceSets.main.runtimeClasspath
+	main = 'io.lonelyrobot.empires.server.ClientTest'
+}
 

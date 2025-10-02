@@ -4,14 +4,21 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 sourceSets.test.java.srcDirs = [ "test/" ]
 
 dependencies {
-  compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+  implementation group: 'commons-collections', name: 'commons-collections', version: '3.2'
 
   /** Apache commons libraries that are useful to have **/
-  compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.3.2'
-  compile group: 'org.apache.commons', name: 'commons-math3', version: '3.0'
-  compile group: 'org.apache.commons', name: 'commons-math3', version: '2.2'
+  implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.3.2'
+  implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.0'
+  // older math fallback (kept commented) - not exported
+  // implementation group: 'org.apache.commons', name: 'commons-math3', version: '2.2'
 
-  compile "net.sourceforge:javaml:0.1.7"
+  // Java-ML artifact is not available on Maven Central; the project provides a
+  // minimal local KDTree implementation under `net.sf.javaml.core.kdtree.KDTree`.
+  // If you have the original javaml jar, place it in lib/ and uncomment the
+  // following lines to use the local jar instead.
+  if (file('lib/javaml-0.1.7.jar').exists()) {
+    implementation files('lib/javaml-0.1.7.jar')
+  }
   // compile group: 'net.sourceforge', name:'javaml', version: '0.1.7'
 
 // // PICK ONE!

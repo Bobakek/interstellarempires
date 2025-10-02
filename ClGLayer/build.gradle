@@ -35,34 +35,37 @@ project.ext.assetsDir = new File("assets");
 dependencies {
 
   /* Include client network layer */
-  compile project(':ClNetworking')
+  implementation project(':ClNetworking')
 
   /* Include shared game framework */
-  compile project(':GameFramework')
+  implementation project(':GameFramework')
   
-  compile group: 'log4j', name: 'log4j', version: '1.2.17'
+  implementation group: 'log4j', name: 'log4j', version: '1.2.17'
   
-  compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-  compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-  compile "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
-  compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-  compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+  implementation "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
+  implementation "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+  implementation "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
 
-  compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 
-  compile "com.kotcrab.vis:vis-ui:0.9.4"
-  compile "com.kotcrab.vis:vis-runtime:0.3.0"
+  implementation "com.kotcrab.vis:vis-ui:0.9.4"
+  implementation "com.kotcrab.vis:vis-runtime:0.3.0"
+  
+  // ensure Vector2D (commons-math3) is available to the client
+  implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.0'
 
-  compile "com.underwaterapps.overlap2druntime:overlap2d-runtime-libgdx:0.1.0"
-  compile "net.dermetfan.libgdx-utils:libgdx-utils:0.13.2"
-  compile "net.dermetfan.libgdx-utils:libgdx-utils-box2d:0.13.2"
+  implementation "com.underwaterapps.overlap2druntime:overlap2d-runtime-libgdx:0.1.0"
+  implementation "net.dermetfan.libgdx-utils:libgdx-utils:0.13.2"
+  implementation "net.dermetfan.libgdx-utils:libgdx-utils-box2d:0.13.2"
 
-  compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-  compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-  compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-  compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-  compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-  compile "com.badlogicgames.gdx:gdx-controllers-desktop:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+  implementation "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+  implementation "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+  implementation "com.badlogicgames.gdx:gdx-controllers-desktop:$gdxVersion"
 }
 
 /** Packaging task */
@@ -70,12 +73,19 @@ jar {
   exclude "META-INF/*.SF"
   exclude "META-INF/*.DSA"
   exclude "META-INF/*.RSA"
-
   manifest.attributes "Main-Class": project.mainClassName
-  build.dependsOn classes
+  dependsOn classes
 
-  from files(sourceSets.main.output.classesDir);
-  from files(sourceSets.main.output.resourcesDir);
-  from { configurations.compile.collect { zipTree(it) } }
-  from files(project.assetsDir);
+  // avoid duplicate META-INF files from dependencies
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+  from sourceSets.main.output
+  // include runtime dependencies into fat jar
+  from {
+    configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+  // exclude common duplicate license/notice files
+  exclude 'META-INF/LICENSE', 'META-INF/LICENSE.txt', 'META-INF/NOTICE', 'META-INF/NOTICE.txt'
+
+  from files(project.assetsDir)
 }
